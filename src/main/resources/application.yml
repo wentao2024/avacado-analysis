@@ -1,0 +1,52 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: analysis
+  main:
+    allow-bean-definition-overriding: false
+
+spark:
+  executor:
+    memory: ${EXECUTOR_MEMORY:4g}  # Uses an environment variable with a default of 4g
+    cores: ${EXECUTOR_CORES:8}  # Uses an environment variable with a default of 8
+  driver:
+    memory: ${DRIVER_MEMORY:2g}  # Uses an environment variable with a default of 2g
+  default:
+    parallelism: ${DEFAULT_PARALLELISM:8}  # Uses an environment variable with a default of 8
+  shuffle:
+    service:
+      enabled: true
+    compress: true
+    file:
+      buffer: ${FILE_BUFFER:1m}  # Uses an environment variable with a default of 1m
+
+logging:
+  level:
+    root: debug
+#  pattern:
+#    console: "%clr(%d{yyyy-MM-dd HH:mm:ss}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(-){faint} %clr([%14.14t]){faint} %clr(%-40.40logger.%13.13M){cyan} %clr(%3.3L) %clr(:){faint} %msg%n${LOG_EXCEPTION_CONVERSION_WORD:%wEx}"
+
+
+management:
+  endpoints:
+    enabled-by-default: true
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always
+      enabled: true
+      probes:
+        enabled: true
+    prometheus:
+      enabled: true
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http:
+          client:
+            requests: true
+          server:
+            requests: true

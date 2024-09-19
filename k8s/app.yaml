@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cs532-service
+  labels:
+    app: cs532
+spec:
+  selector:
+    app: cs532
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+      name: web
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cs532-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cs532
+  template:
+    metadata:
+      labels:
+        app: cs532
+    spec:
+      containers:
+        - name: cs532-container
+          image: cs532:v1
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: EXECUTOR_MEMORY
+              value: "1g"
+            - name: EXECUTOR_CORES
+              value: "1"
+            - name: DRIVER_MEMORY
+              value: "1g"
+            - name: DEFAULT_PARALLELISM
+              value: "1"
+            - name: FILE_BUFFER
+              value: "1m"
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: cs532-servicemonitor
+  labels:
+    team: frontend
+spec:
+  selector:
+    matchLabels:
+      app: cs532
+  endpoints:
+    - port: "web"
+      path: /actuator/prometheus
+      interval: 15s
